@@ -16,7 +16,7 @@ export const login = async  (values: z.infer<typeof LoginSchema>) => {
         return { error: "Invalid fields!" };
     }
 
-    const { email, password } = validatedFields.data;
+    const { email, password, code } = validatedFields.data;
 
     const existingUser = await getUserByEmail(email);
 
@@ -36,14 +36,18 @@ export const login = async  (values: z.infer<typeof LoginSchema>) => {
     }
 
     if (existingUser.isTwoFactorEnabled && existingUser.email) {
-        const twoFactorToken = await generateTwoFactorToken(existingUser.email);
+        if (!code) {
+            // TODO: verify code
+        } else {
+            const twoFactorToken = await generateTwoFactorToken(existingUser.email);
 
-        await sendTwoFactorTokenEmail(
-            twoFactorToken.email,
-            twoFactorToken.token,
-        );
+            await sendTwoFactorTokenEmail(
+                twoFactorToken.email,
+                twoFactorToken.token,
+            );
 
-        return { twoFactor: true };
+            return { twoFactor: true };
+        }
     }
 
     try {
