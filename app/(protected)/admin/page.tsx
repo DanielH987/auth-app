@@ -7,6 +7,17 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { UserRole } from "@prisma/client";
 
 const AdminPage = () => {
+    const onAPIRouteClick = () => {
+        fetch("/api/admin")
+        .then((response) => {
+            if (response.ok) {
+                console.log("OKAY");
+            } else {
+                console.log("FORBIDDEN");
+            }
+        });
+    };
+
     return (
         <Card className="w-[600px]">
             <CardHeader>
@@ -22,7 +33,7 @@ const AdminPage = () => {
                     <p className="text-sm font-medium">
                         Admin-only API Route
                     </p>
-                    <Button>
+                    <Button onClick={onAPIRouteClick}>
                         Click to test!
                     </Button>
                 </div>
