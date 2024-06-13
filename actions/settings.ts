@@ -57,7 +57,7 @@ export const settings = async (
         values.newPassword = undefined;
     }
 
-    const updatedUser = await db.user.update({
+    await db.user.update({
         where: { id: dbUser.id },
         data: {
             ...values,
