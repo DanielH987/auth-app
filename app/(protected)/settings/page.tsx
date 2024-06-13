@@ -47,11 +47,12 @@ const SettingsPage = () => {
   const form = useForm<z.infer<typeof SettingsSchema>>({
     resolver: zodResolver(SettingsSchema),
     defaultValues: {
-      password: "", 
-      newPassword: "",
+      password: undefined, 
+      newPassword: undefined,
       name: user?.name || undefined,
       email: user?.email || undefined,
       role: user?.role || undefined,
+      isTwoFactorEnabled: user?.isTwoFactorEnabled || undefined,
     }
   });
 
@@ -63,8 +64,8 @@ const SettingsPage = () => {
           setError(data.error);
         }
         if (data.success) {
-          setSuccess(data.success);
           update();
+          setSuccess(data.success);
         }
       })
       .catch(() => setError("Something went wrong!"));
