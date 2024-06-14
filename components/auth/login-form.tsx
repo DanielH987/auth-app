@@ -19,6 +19,11 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSlot,
+} from "@/components/ui/input-otp";  
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import { login } from "@/actions/login";
 
@@ -85,20 +90,26 @@ export const LoginForm = () => {
                             control={form.control}
                             name="code"
                             render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Two Factor Code</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            disabled={isPending}
-                                            placeholder="123456"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}  
+                            <FormItem>
+                                <FormLabel>Two Factor Code</FormLabel>
+                                <FormControl>
+                                <InputOTP
+                                    {...field}
+                                    maxLength={6}
+                                    onChange={field.onChange}
+                                    disabled={isPending}
+                                >
+                                    {[...Array(6)].map((_, index) => (
+                                    <InputOTPSlot key={index} index={index} />
+                                    ))}
+                                </InputOTP>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
                         />
                     )}
+
                     {!showTwoFactor && (
                         <>
                             <FormField
