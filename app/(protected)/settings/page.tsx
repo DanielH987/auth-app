@@ -7,14 +7,25 @@ import { useTransition, useState } from "react";
 import { useSession } from "next-auth/react";
 import { SettingsSchema } from "@/schemas";
 import { Switch } from "@/components/ui/switch";
-import { 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
+import {
   Card,
   CardHeader,
   CardContent,
@@ -35,14 +46,21 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { FormSuccess } from "@/components/form-success";
 import { FormError } from "@/components/form-error";
 import { UserRole } from "@prisma/client";
+import { deleteAccount } from "@/actions/delete-account";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { ClipLoader } from "react-spinners";
 
 const SettingsPage = () => {
   const user = useCurrentUser();
+  const router = useRouter();
 
   const [error, setError] = useState<string | undefined>();
   const [success, setSuccess] = useState<string | undefined>();
   const { update } = useSession();
   const [isPending, startTransition] = useTransition();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof SettingsSchema>>({
     resolver: zodResolver(SettingsSchema),
@@ -55,6 +73,10 @@ const SettingsPage = () => {
       isTwoFactorEnabled: user?.isTwoFactorEnabled || undefined,
     }
   });
+
+  if (!user) {
+    return <ClipLoader/>;
+  }
 
   const onSubmit = (values: z.infer<typeof SettingsSchema>) => {
     startTransition(() => {
@@ -72,7 +94,26 @@ const SettingsPage = () => {
     });
   }
 
- return (
+  const handleDeleteAccount = () => {
+    if (user?.id) { 
+      setIsDeleting(true);
+      deleteAccount(user.id)
+        .then((data) => {
+          if (data.error) {
+            setError(data.error);
+          }
+          if (data.success) {
+            setSuccess(data.success);
+            signOut();
+            router.push("/");
+          }
+        })
+        .catch(() => setError("Something went wrong!"))
+        .finally(() => setIsDeleting(false));
+    }
+  };
+
+  return (
     <Card className="w-[600px]">
       <CardHeader>
         <p className="text-2xl font-semibold text-center">
@@ -203,6 +244,31 @@ const SettingsPage = () => {
             </Button>
           </form>
         </Form>
+        <div className="mt-6">
+          <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <AlertDialogTrigger asChild>
+              <Button 
+                disabled={isPending || isDeleting} 
+                variant="destructive"
+              >
+                {isDeleting ? "Deleting..." : "Delete Account"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete your account
+                  and remove your data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteAccount}>Continue</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </CardContent>
     </Card>
   );
