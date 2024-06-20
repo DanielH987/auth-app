@@ -9,7 +9,7 @@ export const sendTwoFactorTokenEmail = async (
     token: string
 ) => {
     await resend.emails.send({
-        from: "onboarding@resend.dev",
+        from: "AuthApp <mail@authapp.tech>",
         to: email,
         subject: "2FA Code",
         html: `
@@ -29,7 +29,7 @@ export const sendPasswordResetEmail = async (
     const resetLink = `${domain}/auth/new-password?token=${token}`;
 
     await resend.emails.send({
-        from: "onboarding@resend.dev",
+        from: "AuthApp <mail@authapp.tech>",
         to: email,
         subject: "Reset your password",
         html: `
@@ -51,7 +51,7 @@ export const sendVerificationEmail = async (
     const confirmLink = `${domain}/auth/new-verification?token=${token}`;
 
     await resend.emails.send({
-        from: "onboarding@resend.dev",
+        from: "AuthApp <mail@authapp.tech>",
         to: email,
         subject: "Confirm your email",
         html: `
@@ -72,7 +72,7 @@ export const sendAccountTerminationEmail = async (
 ) => {
 
     await resend.emails.send({
-        from: "onboarding@resend.dev",
+        from: "AuthApp <mail@authapp.tech>",
         to: email,
         subject: "Account Termination Confirmation",
         html: `
