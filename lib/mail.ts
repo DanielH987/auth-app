@@ -66,3 +66,24 @@ export const sendVerificationEmail = async (
         `
     });
 };
+
+export const sendAccountTerminationEmail = async (
+    email: string
+) => {
+
+    await resend.emails.send({
+        from: "onboarding@resend.dev",
+        to: email,
+        subject: "Account Termination Confirmation",
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #dddddd; border-radius: 5px;">
+                <h2 style="text-align: center; color: #FF6347;">Account Termination</h2>
+                <p style="font-size: 16px; text-align: center; color: #333333;">We confirm that your account has been successfully deleted from our system.</p>
+                <p style="font-size: 16px; text-align: center; color: #333333;">If you did not request this action or believe this is a mistake, please contact our support team immediately.</p>
+                <p style="font-size: 14px; text-align: center; color: #777777;">Thank you for being a part of our community. If you have any questions or need assistance, feel free to reach out to us.</p>
+                <p style="font-size: 14px; text-align: center; color: #777777;">Best regards,</p>
+                <p style="font-size: 14px; text-align: center; color: #777777;">The Support Team</p>
+            </div>
+        `
+    });
+};
